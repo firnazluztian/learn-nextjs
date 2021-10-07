@@ -26,7 +26,7 @@ const DUMMY_MEETUPS = [
 
 function HomePage() {
   return <>
-    <div style={{margin: '0 auto', width: 700}}>
+    <div style={{margin: '0 auto', width: 800}}>
       <MeetUpList meetups={DUMMY_MEETUPS} />
     </div>
     
