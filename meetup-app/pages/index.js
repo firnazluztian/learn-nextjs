@@ -21,11 +21,19 @@ const DUMMY_MEETUPS = [
     image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
     address: 'kuta beach, Bali',
     description: 'this is bali in here we have so many beaches'
-  }
+  },
 ]
 
-function HomePage() {
-  return <MeetUpList meetups={DUMMY_MEETUPS} />
+function HomePage(props) {
+  return <MeetUpList meetups={props.meetups} />
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      meetups: DUMMY_MEETUPS
+    }
+  }
 }
 
 export default HomePage;
