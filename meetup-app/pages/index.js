@@ -25,14 +25,37 @@ const DUMMY_MEETUPS = [
 ]
 
 function HomePage(props) {
+  console.log(props)
   return <MeetUpList meetups={props.meetups} />
 }
 
+// both getServerSideProps and getStaticProps can be async
+// code wont be run in client side, only on server
+// makes it best for authentication key or other purposes that clients side dont need to see
+
+// // better for data that changes frequently or change multiple time every request
+// export async function getServerSideProps(context) {
+//   const req = context.req;
+//   const res = context.res;
+//   console.log(req, res);
+//   // fetch data from api
+//   return {
+//     props: {
+//       meetups: DUMMY_MEETUPS
+//     }
+//   }
+// }
+
+
+// Static Site Generator (SSG)
+// Server Side Rendering (SSR)
+// faster can define revalidate when to request
 export async function getStaticProps() {
   return {
     props: {
       meetups: DUMMY_MEETUPS
-    }
+    },
+    revalidate: 1
   }
 }
 
