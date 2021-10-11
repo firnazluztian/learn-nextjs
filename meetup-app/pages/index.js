@@ -1,32 +1,12 @@
-import MeetUpList from '../components/meetups/MeetupList'
-
-const DUMMY_MEETUPS = [
-  {
-    id: 'm1',
-    title: 'First Meetup',
-    image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
-    address: 'kuta beach, Bali',
-    description: 'this is bali in here we have so many beaches'
-  },
-  {
-    id: 'm2',
-    title: 'First Meetup',
-    image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
-    address: 'kuta beach, Bali',
-    description: 'this is bali in here we have so many beaches'
-  },
-  {
-    id: 'm3',
-    title: 'First Meetup',
-    image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
-    address: 'kuta beach, Bali',
-    description: 'this is bali in here we have so many beaches'
-  },
-]
+// client side
+import MeetUpList from "../components/meetups/MeetupList";
+// server side
+import { getMongoURL } from './constant';
+import { MongoClient } from 'mongodb';
 
 function HomePage(props) {
-  console.log(props)
-  return <MeetUpList meetups={props.meetups} />
+  console.log(props);
+  return <MeetUpList meetups={props.meetups} />;
 }
 
 // both getServerSideProps and getStaticProps can be async
@@ -46,17 +26,28 @@ function HomePage(props) {
 //   }
 // }
 
-
 // Static Site Generator (SSG)
 // Server Side Rendering (SSR)
 // faster can define revalidate when to request
 export async function getStaticProps() {
+  // fetch GET here
+  const URL = getMongoURL()
+  const client = await MongoClient.connect(URL)
+  const db = client.db()
+  const meetupsCollection = db.collection('meetups');
+  const meetups = await meetupsCollection.find().toArray();
+  client.close();
   return {
     props: {
-      meetups: DUMMY_MEETUPS
+      meetups: meetups.map(item => ({
+        title: item.title,
+        address: item.address,
+        image: item.image,
+        id: item._id.toString(),
+      })),
     },
-    revalidate: 1
-  }
+    revalidate: 1,
+  };
 }
 
 export default HomePage;
