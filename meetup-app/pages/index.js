@@ -1,12 +1,21 @@
 // client side
 import MeetUpList from "../components/meetups/MeetupList";
+import Head from 'next/head'
 // server side
-import { getMongoURL } from './constant';
+import { getMongoURL } from './utils';
 import { MongoClient } from 'mongodb';
 
 function HomePage(props) {
   console.log(props);
-  return <MeetUpList meetups={props.meetups} />;
+  return (
+    <>
+      <Head>
+        <title>React Meetup Next.js</title>
+        <meta name="description" content="browse a huge list of highly react meetups" />
+      </Head>
+      <MeetUpList meetups={props.meetups} />
+    </>
+  )
 }
 
 // both getServerSideProps and getStaticProps can be async

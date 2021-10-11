@@ -1,4 +1,4 @@
-import { getMongoURL } from '../constant';
+import { getMongoURL } from '../utils';
 import { MongoClient } from 'mongodb';
 // api/new-meetup
 

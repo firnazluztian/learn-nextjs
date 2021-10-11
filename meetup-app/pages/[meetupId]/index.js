@@ -1,53 +1,69 @@
-import React from 'react'
-import MeetupDetail from '../../components/meetups/MeetupDetail'
+import React from "react";
+import MeetupDetail from "../../components/meetups/MeetupDetail";
+import Head from 'next/head'
 
-// const DUMMY_MEETUPS = {
-//   id: 'm1',
-//   title: 'First Meetup',
-//   image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
-//   address: 'kuta beach, Bali',
-//   description: 'this is bali in here we have so many beaches'
-// }
+// server
+import { MongoClient, ObjectId } from 'mongodb'
+import { getMongoURL } from '../utils';
 
 export default function MeetupDetails(props) {
   const meetup = props.meetupsData;
   return (
-    <MeetupDetail
-      image={meetup.image}
-      title={meetup.title}
-      description={meetup.description}
-      alt={meetup.title}
-      address={meetup.address}
-    />
-  )
+    <>
+      <Head>
+        <title>{meetup.title}</title>
+        <meta name="description" content={meetup.description} />
+      </Head>
+      <MeetupDetail
+        image={meetup.image}
+        title={meetup.title}
+        description={meetup.description}
+        alt={meetup.title}
+        address={meetup.address}
+      />
+    </>
+  );
 }
 
 export async function getStaticPaths() {
+  const URL = getMongoURL()
+  const client = await MongoClient.connect(URL)
+  const db = client.db()
+  const meetupsCollection = db.collection('meetups');
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+  client.close();
   return {
     fallback: false,
-    paths: [
-      { 
-        params: { meetupId: 'm1' }
-      },
-      { 
-        params: { meetupId: 'm2' }
+    paths: meetups.map(item => ({
+      params: {
+        meetupId: item._id.toString()
       }
-    ]
-  }
+    }))
+  };
 }
 
 export async function getStaticProps(context) {
   const meetupId = context.params.meetupId;
-  console.log('meetupId', meetupId)
+
+  const URL = getMongoURL()
+  const client = await MongoClient.connect(URL)
+  const db = client.db()
+  const meetupsCollection = db.collection('meetups');
+
+  const selectedMeetup = await meetupsCollection.findOne({_id: ObjectId(meetupId) })
+
+  
+
+  console.log("meetupId", meetupId);
   return {
     props: {
       meetupsData: {
-        id: 'm1',
-        title: 'First Meetup',
-        image: 'https://pix10.agoda.net/hotelImages/4869553/0/35b103e869655a2959fac36f614fa08e.jpg?s=1024x768',
-        address: 'kuta beach, Bali',
-        description: 'this is bali in here we have so many beaches'
-      }
-    }
-  }
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description
+      },
+    },
+  };
 }
